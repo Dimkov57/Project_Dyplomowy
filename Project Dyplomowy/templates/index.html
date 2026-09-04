@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Books</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 40px;
+            background: #f4f4f4;
+        }
+        .container {
+            max-width: 700px;
+            margin: 0 auto;
+            background: white;
+            padding: 24px;
+            border-radius: 10px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+        input, button {
+            padding: 10px;
+            margin: 8px 0;
+            width: 100%;
+            box-sizing: border-box;
+        }
+        ul {
+            padding-left: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Books</h1>
+        <form id="book-form">
+            <input type="text" id="title" placeholder="Book title" required>
+            <input type="text" id="author" placeholder="Author" required>
+            <button type="submit">Add Book</button>
+        </form>
+
+        <ul id="book-list"></ul>
+    </div>
+
+    <script>
+        async function loadBooks() {
+            const response = await fetch('/api/books');
+            const books = await response.json();
+            const list = document.getElementById('book-list');
+            list.innerHTML = '';
+
+            books.forEach(book => {
+                const item = document.createElement('li');
+                item.textContent = `${book.title} by ${book.author}`;
+                list.appendChild(item);
+            });
+        }
+
+        document.getElementById('book-form').addEventListener('submit', async function (event) {
+            event.preventDefault();
+            const title = document.getElementById('title').value;
+            const author = document.getElementById('author').value;
+
+            await fetch('/api/books', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({ title, author })
+            });
+
+            document.getElementById('book-form').reset();
+            loadBooks();
+        });
+
+        loadBooks();
+    </script>
+</body>
+</html>
